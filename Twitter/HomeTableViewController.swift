@@ -16,9 +16,14 @@ class HomeTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadTweets()
         myRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged )
         tableView.refreshControl = myRefreshControl
+        self.tableView.estimatedRowHeight = 150
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweets()
     }
 
     // MARK: - Table view data source
@@ -37,6 +42,11 @@ class HomeTableViewController: UITableViewController {
         cell.userName.text = user["name"] as? String
         cell.tweetContent.text = dict["text"] as? String
         cell.userImage.af_setImage(withURL:         URL(string: user["profile_image_url_https"] as! String)!)
+        
+        cell.setFavorited(dict["favorited"] as! Bool)
+        cell.tweetId = dict["id"] as! Int
+        cell.setRetweeted(dict["retweeted"] as! Bool)
+        print(dict)
         return cell
     }
     
@@ -60,7 +70,7 @@ class HomeTableViewController: UITableViewController {
             self.tableView.reloadData()
             self.myRefreshControl.endRefreshing()
         }, failure: { (Error) in
-            print("Could not get tweets.")
+            print("Could not get tweets. \(Error)")
         })
     }
     
